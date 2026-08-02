@@ -1,0 +1,41 @@
+name: Feature request
+description: Suggest an improvement for conversion, readers, languages, or UX
+title: "[Feature]: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Inkbound is English-first today; language and device feedback is especially welcome.
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem / motivation
+      description: What are you trying to do that is hard today?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: What would you like Inkbound to do?
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Reader profiles / e-ink CSS
+        - Chapter detection
+        - Languages / i18n
+        - OCR / images
+        - Codespaces / docs
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: extras
+    attributes:
+      label: Extra context
+      description: Device model, sample public-domain PDF notes, screenshots, etc.

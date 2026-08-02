@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Inkbound Discussions
+    url: https://github.com/nirmal5307/pdf-to-epub-formater/discussions
+    about: Questions, ideas, language help, and device tips
+  - name: Codespaces guide
+    url: https://github.com/nirmal5307/pdf-to-epub-formater/wiki/Codespaces
+    about: Try Inkbound in the browser with auto-start

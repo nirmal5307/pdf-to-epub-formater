@@ -1,0 +1,41 @@
+name: Bug report
+description: Something is broken in convert, UI, CLI, or Codespaces
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for the report. Please **do not** attach copyrighted books — use a public-domain sample or describe the problem with screenshots.
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: Clear steps to reproduce, and what you expected instead.
+      placeholder: |
+        1. Open Inkbound…
+        2. Drop this kind of PDF…
+        3. See error / bad chapters…
+    validations:
+      required: true
+  - type: dropdown
+    id: where
+    attributes:
+      label: Where did you run Inkbound?
+      options:
+        - Local (./run.sh)
+        - CLI (python -m app.cli)
+        - GitHub Codespaces
+        - Other
+    validations:
+      required: true
+  - type: input
+    id: reader
+    attributes:
+      label: Target e-ink reader (if relevant)
+      placeholder: Kobo / Kindle / BOOX / Xteink / …
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs or error text
+      render: shell

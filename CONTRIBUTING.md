@@ -28,3 +28,7 @@ Or use [Codespaces](docs/CODESPACES.md) — the app auto-starts after the contai
 - Keep changes focused  
 - Add or update a test when you change extract/split/API behaviour  
 - Synthetic PDFs only under `tests/` (no copyrighted fixtures)
+
+## Code of Conduct
+
+Please read and follow our [Code of Conduct](CODE_OF_CONDUCT.md).

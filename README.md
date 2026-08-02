@@ -240,6 +240,10 @@ Open an [issue](https://github.com/nirmal5307/pdf-to-epub-formater/issues) or pu
 
 ---
 
+## Code of Conduct
+
+Participation is covered by our [Code of Conduct](CODE_OF_CONDUCT.md).
+
 ## License
 
 [MIT](LICENSE) — free to use, modify, and share.
