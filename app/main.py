@@ -448,12 +448,23 @@ async def cleanup():
 
 
 def run() -> None:
+    import os
+
     import uvicorn
+
+    # Local default stays loopback; Codespaces/containers need 0.0.0.0 for port forward.
+    if os.environ.get("INKBOUND_HOST"):
+        host = os.environ["INKBOUND_HOST"]
+    elif os.environ.get("CODESPACES") == "true":
+        host = "0.0.0.0"
+    else:
+        host = "127.0.0.1"
+    port = int(os.environ.get("INKBOUND_PORT", "8765"))
 
     uvicorn.run(
         "app.main:app",
-        host="127.0.0.1",
-        port=8765,
+        host=host,
+        port=port,
         reload=False,
     )
 

@@ -2,14 +2,22 @@
   "name": "Inkbound",
   "image": "mcr.microsoft.com/devcontainers/python:3.12",
   "features": {
-    "ghcr.io/devcontainers/features/common-utils:2": {}
+    "ghcr.io/devcontainers/features/common-utils:2": {
+      "installZsh": false,
+      "upgradePackages": false
+    }
   },
-  "postCreateCommand": "python -m pip install --upgrade pip && pip install -r requirements.txt",
+  "containerEnv": {
+    "INKBOUND_HOST": "0.0.0.0",
+    "INKBOUND_PORT": "8765"
+  },
+  "postCreateCommand": "bash .devcontainer/setup.sh",
+  "postStartCommand": "bash .devcontainer/start-inkbound.sh",
   "forwardPorts": [8765],
   "portsAttributes": {
     "8765": {
-      "label": "Inkbound",
-      "onAutoForward": "notify"
+      "label": "Inkbound web UI",
+      "onAutoForward": "openBrowser"
     }
   },
   "customizations": {

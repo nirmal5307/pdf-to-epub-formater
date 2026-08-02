@@ -9,8 +9,9 @@ First public release of **Inkbound** — a local PDF → EPUB converter for e-in
 - Typography controls, e-ink image pass, optional OCR
 - Smart chaptering (TOC / Part / “How to…” aware)
 - EPUB3 + NCX for wide sideload support
+- **GitHub Codespaces** — one-click try (auto-starts the web UI)
 
-## Quick start
+## Quick start (local)
 
 ```bash
 git clone https://github.com/nirmal5307/pdf-to-epub-formater.git
@@ -22,7 +23,11 @@ pip install -r requirements.txt
 
 Open http://127.0.0.1:8765
 
-Or [Open in GitHub Codespaces](https://codespaces.new/nirmal5307/pdf-to-epub-formater?quickstart=1).
+## Try in Codespaces
+
+[Open in GitHub Codespaces](https://codespaces.new/nirmal5307/pdf-to-epub-formater?quickstart=1) — setup installs dependencies and Tesseract, then starts Inkbound on port 8765 automatically.
+
+See [docs/CODESPACES.md](https://github.com/nirmal5307/pdf-to-epub-formater/blob/main/docs/CODESPACES.md).
 
 ## License
 
