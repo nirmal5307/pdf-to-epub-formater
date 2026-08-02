@@ -1,0 +1,28 @@
+{
+  "name": "Inkbound",
+  "image": "mcr.microsoft.com/devcontainers/python:3.12",
+  "features": {
+    "ghcr.io/devcontainers/features/common-utils:2": {}
+  },
+  "postCreateCommand": "python -m pip install --upgrade pip && pip install -r requirements.txt",
+  "forwardPorts": [8765],
+  "portsAttributes": {
+    "8765": {
+      "label": "Inkbound",
+      "onAutoForward": "notify"
+    }
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": ["ms-python.python"],
+      "settings": {
+        "python.defaultInterpreterPath": "/usr/local/bin/python"
+      }
+    }
+  },
+  "hostRequirements": {
+    "cpus": 2,
+    "memory": "4gb",
+    "storage": "8gb"
+  }
+}

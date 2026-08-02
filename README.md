@@ -10,6 +10,7 @@ Also works from the command line for batch conversion.
 [![Python 3.11+](https://img.shields.io/badge/Python-3.11%2B-blue.svg)](https://www.python.org/)
 [![Runs locally](https://img.shields.io/badge/privacy-100%25%20local-success.svg)](#why-inkbound)
 [![EPUB3](https://img.shields.io/badge/output-EPUB3%20%2B%20NCX-informational.svg)](#features)
+[![Open in GitHub Codespaces](https://img.shields.io/badge/Codespaces-Open-blue?logo=github)](https://codespaces.new/nirmal5307/pdf-to-epub-formater?quickstart=1)
 
 ![Inkbound web UI — PDF to EPUB for e-ink](docs/screenshots/inkbound-home.jpg)
 
@@ -52,7 +53,11 @@ Also works from the command line for batch conversion.
 
 ![Inkbound full UI with reader profiles, typography, and OCR controls](docs/screenshots/inkbound-ui-full.jpg)
 
-> More shots welcome: drop device photos (Kobo / Kindle / Xteink with a converted EPUB) into `docs/screenshots/` — real e-ink photos help discovery a lot.
+### E-ink reading preview
+
+![E-ink style EPUB preview from Inkbound](docs/screenshots/inkbound-eink-preview.jpg)
+
+> Have a real device photo? Drop a Kobo / Kindle / Xteink shot into `docs/screenshots/` (e.g. `inkbound-on-device.jpg`) and it will replace this preview in a future update.
 
 ---
 
@@ -75,7 +80,9 @@ pip install -r requirements.txt
 ./run.sh
 ```
 
-Open **http://127.0.0.1:8765**
+Or try in the browser with **[Open in GitHub Codespaces](https://codespaces.new/nirmal5307/pdf-to-epub-formater?quickstart=1)** — after the container builds, run `./run.sh` and open the forwarded port **8765**.
+
+Open **http://127.0.0.1:8765** locally.
 
 1. Drop one or more PDFs  
 2. Pick a **reader profile** (Universal, Kobo, Kindle, BOOX, Compact)  
