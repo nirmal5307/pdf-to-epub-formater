@@ -80,17 +80,21 @@ pip install -r requirements.txt
 ./run.sh
 ```
 
-### Try in GitHub Codespaces (no local install)
+### Try in GitHub Codespaces (no local install — easiest)
 
 [![Open in GitHub Codespaces](https://img.shields.io/badge/Codespaces-Open-blue?logo=github)](https://codespaces.new/nirmal5307/pdf-to-epub-formater?quickstart=1)
 
-1. Click **Open in GitHub Codespaces**  
-2. Wait for setup (deps + Tesseract OCR)  
-3. Inkbound **auto-starts** and opens on port **8765**
+**For first-time users:** you do not need to install Python or run any commands.
 
-Details: [docs/CODESPACES.md](docs/CODESPACES.md)
+1. Click **Open in GitHub Codespaces** (sign in to GitHub if asked)  
+2. Wait for the Codespace to finish loading / building (first time can take a few minutes)  
+3. When it’s ready, Inkbound **automatically starts and runs** — the web UI opens on port **8765**  
+4. Drop a PDF → convert → download your EPUB  
 
-Open **http://127.0.0.1:8765** when running locally.
+No `./run.sh` needed in Codespaces on first launch.  
+Full walkthrough + troubleshooting: **[docs/CODESPACES.md](docs/CODESPACES.md)**
+
+> Prefer fully offline? Skip Codespaces and use the local install above, then open **http://127.0.0.1:8765**.
 
 1. Drop one or more PDFs  
 2. Pick a **reader profile** (Universal, Kobo, Kindle, BOOX, Compact)  

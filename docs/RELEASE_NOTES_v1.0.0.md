@@ -23,11 +23,15 @@ pip install -r requirements.txt
 
 Open http://127.0.0.1:8765
 
-## Try in Codespaces
+## Try in Codespaces (easiest for first-time users)
 
-[Open in GitHub Codespaces](https://codespaces.new/nirmal5307/pdf-to-epub-formater?quickstart=1) — setup installs dependencies and Tesseract, then starts Inkbound on port 8765 automatically.
+[Open in GitHub Codespaces](https://codespaces.new/nirmal5307/pdf-to-epub-formater?quickstart=1)
 
-See [docs/CODESPACES.md](https://github.com/nirmal5307/pdf-to-epub-formater/blob/main/docs/CODESPACES.md).
+1. Sign in to GitHub and open the link  
+2. Wait for the Codespace to finish loading  
+3. **Inkbound starts automatically** — no commands to type — and the UI opens on port **8765**
+
+Step-by-step guide: [docs/CODESPACES.md](https://github.com/nirmal5307/pdf-to-epub-formater/blob/main/docs/CODESPACES.md).
 
 ## License
 
