@@ -14,6 +14,7 @@ Also works from the command line for batch conversion.
 [![Python 3.11+](https://img.shields.io/badge/Python-3.11%2B-blue.svg)](https://www.python.org/)
 [![Runs locally](https://img.shields.io/badge/privacy-100%25%20local-success.svg)](#why-inkbound)
 [![EPUB3](https://img.shields.io/badge/output-EPUB3%20%2B%20NCX-informational.svg)](#features)
+[![Language](https://img.shields.io/badge/UI%20%26%20heuristics-English%20first-lightgrey.svg)](#language-support)
 
 ![Inkbound web UI — PDF to EPUB for e-ink](docs/screenshots/inkbound-home.jpg)
 
@@ -26,13 +27,27 @@ Also works from the command line for batch conversion.
 | Need | Inkbound |
 |------|----------|
 | Convert **PDF to EPUB** for sideloading | Yes — EPUB3 + NCX for wide device support |
-| Keep files **offline / private** | Yes — nothing leaves your machine |
+| Keep files **offline / private** | Yes — nothing leaves your machine (local mode) |
+| Try in the browser with no install | Yes — [GitHub Codespaces](#try-in-github-codespaces-no-local-install--easiest) auto-starts the app |
 | Optimize for **e-ink readers** | Yes — greyscale images, typography presets |
 | Support **Kobo / Kindle / BOOX / PocketBook / Xteink** | Yes — reader profiles with sensible defaults |
 | Handle **scanned PDFs** | Optional local **Tesseract OCR** |
 | Batch convert many PDFs | Web UI + CLI |
 
-**Keywords people search for:** pdf to epub, pdf to ebook, epub converter, e-ink epub, kobo epub sideload, kindle epub, boox converter, pocketbook epub, offline pdf converter, local ebook converter, tesseract ocr pdf, reflowable epub from pdf.
+**Keywords people search for:** pdf to epub, pdf to ebook, epub converter, e-ink epub, kobo epub sideload, kindle epub, boox converter, pocketbook epub, offline pdf converter, local ebook converter, tesseract ocr pdf, reflowable epub from pdf, github codespaces ebook tool.
+
+---
+
+## Language support
+
+**Inkbound is English-first today.**
+
+- The web UI is in English  
+- Chapter / heading detection is tuned mainly for English books (e.g. “Chapter”, “Part”, “How to…”)  
+- Book language + OCR language pickers already exist for many locales  
+- **More UI languages and better non-English chaptering are coming soon**
+
+If you read or convert books in another language, we’d love your help — see [Contributing](#contributing--looking-for-help).
 
 ---
 
@@ -47,6 +62,7 @@ Also works from the command line for batch conversion.
 - **Margin crop** — trim page edges (0–20%) before extract
 - **Batch mode** — convert multiple PDFs in one go
 - **CLI + local web UI** — `./run.sh` or `python -m app.cli`
+- **GitHub Codespaces** — one-click cloud try; app auto-starts after the container loads
 
 ---
 
@@ -60,7 +76,7 @@ Also works from the command line for batch conversion.
 
 ![E-ink style EPUB preview from Inkbound](docs/screenshots/inkbound-eink-preview.jpg)
 
-> Have a real device photo? Drop a Kobo / Kindle / Xteink shot into `docs/screenshots/` (e.g. `inkbound-on-device.jpg`) and it will replace this preview in a future update.
+> Have a real device photo? Drop a Kobo / Kindle / Xteink shot into `docs/screenshots/` (e.g. `inkbound-on-device.jpg`) and open an issue or PR — real e-ink photos help everyone.
 
 ---
 
@@ -72,7 +88,7 @@ Also works from the command line for batch conversion.
 - Python 3.11+
 - Optional: [Tesseract](https://github.com/tesseract-ocr/tesseract) for OCR (`brew install tesseract`)
 
-### Install & run
+### Install & run (local / private)
 
 ```bash
 git clone https://github.com/nirmal5307/pdf-to-epub-formater.git
@@ -83,13 +99,17 @@ pip install -r requirements.txt
 ./run.sh
 ```
 
+Then open **http://127.0.0.1:8765**
+
 ### Try in GitHub Codespaces (no local install — easiest)
 
 [![Open in GitHub Codespaces](https://img.shields.io/badge/Codespaces-Open-blue?logo=github)](https://codespaces.new/nirmal5307/pdf-to-epub-formater?quickstart=1)
 
+**Works for any GitHub user** (not only the repo owner). Your free GitHub account is enough.
+
 **For first-time users:** you do not need to install Python or run any commands.
 
-1. Click **Open in GitHub Codespaces** (sign in to GitHub if asked)  
+1. Click **[Try Inkbound in your browser](https://codespaces.new/nirmal5307/pdf-to-epub-formater?quickstart=1)** (sign in to GitHub if asked)  
 2. Wait for the Codespace to finish loading / building (first time can take a few minutes)  
 3. When it’s ready, Inkbound **automatically starts and runs** — the web UI opens on port **8765**  
 4. Drop a PDF → convert → download your EPUB  
@@ -97,7 +117,9 @@ pip install -r requirements.txt
 No `./run.sh` needed in Codespaces on first launch.  
 Full walkthrough + troubleshooting: **[docs/CODESPACES.md](docs/CODESPACES.md)**
 
-> Prefer fully offline? Skip Codespaces and use the local install above, then open **http://127.0.0.1:8765**.
+> Codespaces runs in the cloud, so uploads live in that temporary workspace. Prefer fully offline? Use the local install above.
+
+**Once the UI is open (local or Codespaces):**
 
 1. Drop one or more PDFs  
 2. Pick a **reader profile** (Universal, Kobo, Kindle, BOOX, Compact)  
@@ -105,7 +127,7 @@ Full walkthrough + troubleshooting: **[docs/CODESPACES.md](docs/CODESPACES.md)**
 4. Optionally set metadata, OCR, margin crop, and image max edge  
 5. Convert → download the EPUB when ready  
 
-If the port is busy:
+If the local port is busy:
 
 ```bash
 kill $(lsof -tiTCP:8765 -sTCP:LISTEN)
@@ -151,9 +173,10 @@ tesseract --list-langs
 
 ## Who is this for?
 
-- E-ink owners who **sideload EPUBs** to Kobo, Kindle, BOOX, PocketBook, Xteink, Remarkable-adjacent workflows, etc.
+- E-ink owners who **sideload EPUBs** to Kobo, Kindle, BOOX, PocketBook, Xteink, etc.
 - Readers who want **reflowable text** instead of zooming a fixed PDF page
 - Anyone who wants a **private, local PDF → EPUB** pipeline with no SaaS upload
+- People who want to **try in the browser first** via Codespaces, then install locally later
 
 ---
 
@@ -189,13 +212,31 @@ Covers heading/split heuristics, e-ink CSS options, and the convert API with syn
 
 ---
 
-## Roadmap ideas
+## Contributing / looking for help
 
-- More reader presets (Remarkable-friendly CSS, Tolino, etc.)
-- Optional embedded fonts for stubborn devices
-- Better multi-column academic PDF handling
+Inkbound is early and English-first. Contributions are very welcome — especially:
 
-Issues and PRs welcome.
+| We’re looking for | Examples |
+|-------------------|----------|
+| **More languages** | UI translations; chapter words like “Chapitre”, “Kapitel”, “Capítulo”; RTL notes |
+| **Test PDFs** | Public-domain / freely licensed sample books that break chaptering, covers, or OCR |
+| **Device photos** | Converted EPUB on a real Kobo / Kindle / BOOX / Xteink |
+| **Reader feedback** | What CSS / margins / fonts work best on your device |
+| **Edge cases** | Multi-column PDFs, comics/manga, textbooks, scanned paperbacks |
+
+Please **do not** upload copyrighted books to issues or PRs. Use public-domain samples, or describe the problem with screenshots / synthetic fixtures.
+
+Open an [issue](https://github.com/nirmal5307/pdf-to-epub-formater/issues) or pull request — even a short “this French PDF splits badly” report helps.
+
+---
+
+## Roadmap
+
+- More UI languages (beyond English)  
+- Stronger non-English chapter / Part detection  
+- More reader presets (Tolino, etc.)  
+- Optional embedded fonts for stubborn devices  
+- Better multi-column academic PDF handling  
 
 ---
 
@@ -207,4 +248,4 @@ Issues and PRs welcome.
 
 ## Repository topics / search terms
 
-`pdf-to-epub` · `epub-converter` · `ebook-converter` · `e-ink` · `kobo` · `kindle` · `boox` · `pocketbook` · `xteink` · `pdf` · `epub` · `epub3` · `ocr` · `tesseract` · `fastapi` · `python` · `offline` · `local-first` · `sideload`
+`pdf-to-epub` · `epub-converter` · `ebook-converter` · `e-ink` · `kobo` · `kindle` · `boox` · `pocketbook` · `xteink` · `pdf` · `epub` · `epub3` · `ocr` · `tesseract` · `python` · `offline` · `local-first` · `sideload` · `codespaces` · `github-codespaces`

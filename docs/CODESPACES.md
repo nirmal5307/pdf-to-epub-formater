@@ -92,6 +92,12 @@ kill "$(cat "${TMPDIR:-/tmp}/inkbound.pid")" 2>/dev/null || true
 
 ---
 
+## Language note
+
+The app UI and chapter heuristics are **English-first** right now. More languages are coming — see the main README [Contributing](../README.md#contributing--looking-for-help) section if you can help with translations or non-English test PDFs.
+
+---
+
 ## Free-tier tip
 
 GitHub gives a monthly Codespaces allowance on free accounts. Stop or delete the Codespace when you’re done (Codespaces menu → Stop / Delete) so you don’t use hours while idle.
