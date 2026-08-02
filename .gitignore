@@ -1,0 +1,13 @@
+files-raw/
+uploads/
+output/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.env
+.DS_Store
+*.epub
+.pytest_cache/
+.mypy_cache/

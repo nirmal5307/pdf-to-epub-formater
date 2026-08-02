@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Inkbound — PDF to EPUB for e-ink</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,650;9..144,700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/static/style.css" />
+  <script id="profile-defaults" type="application/json">
+    {{ reader_profiles | default([], true) | tojson }}
+  </script>
+</head>
+<body>
+  <div class="grain" aria-hidden="true"></div>
+  <main class="shell">
+    <header class="hero">
+      <p class="brand">Inkbound</p>
+      <h1 class="headline">Local PDF → EPUB for every e-ink</h1>
+      <p class="lede">
+        Rip PDFs on your machine, tune typography for Xteink, Kobo, Kindle, BOOX and more,
+        then download clean reflowable EPUBs — covers and images included.
+      </p>
+    </header>
+
+    <section class="work" aria-label="Convert PDFs">
+      <form id="convert-form" class="dropzone" novalidate>
+        <input type="file" id="pdf-file" name="files" accept="application/pdf,.pdf" multiple hidden />
+        <div class="drop-visual" id="drop-target" tabindex="0" role="button" aria-controls="pdf-file">
+          <span class="drop-mark" aria-hidden="true"></span>
+          <p class="drop-title">Drop PDFs here</p>
+          <p class="drop-hint">one or many · stays on this machine · no cloud</p>
+          <p class="file-name" id="file-label" hidden></p>
+        </div>
+
+        <div class="panel">
+          <h2 class="panel-title">Reader profile</h2>
+          <p class="panel-note" id="profile-hint">Safe defaults for Xteink, Kobo, Kindle, Boox, PocketBook</p>
+          <div class="profile-grid" id="profile-grid" role="radiogroup" aria-label="Reader profile">
+            {% for p in reader_profiles %}
+            <button type="button" class="profile-card {% if p.id == 'universal' %}is-active{% endif %}" data-profile="{{ p.id }}" aria-pressed="{{ 'true' if p.id == 'universal' else 'false' }}">
+              <strong>{{ p.label }}</strong>
+              <span>{{ p.hint }}</span>
+            </button>
+            {% endfor %}
+          </div>
+          <input type="hidden" name="reader_profile" id="reader_profile" value="universal" />
+        </div>
+
+        <div class="panel">
+          <h2 class="panel-title">Metadata</h2>
+          <div class="meta-row">
+            <label>
+              <span>Title <em>(optional · single file)</em></span>
+              <input type="text" name="title" id="title" placeholder="From PDF / filename if empty" autocomplete="off" />
+            </label>
+            <label>
+              <span>Author <em>(optional · single file)</em></span>
+              <input type="text" name="author" id="author" placeholder="Unknown if empty" autocomplete="off" />
+            </label>
+          </div>
+          <div class="meta-row">
+            <label>
+              <span>Book language</span>
+              <select name="language" id="language">
+                {% for code, label in book_langs %}
+                <option value="{{ code }}" {% if code == "en" %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+              </select>
+            </label>
+            <label>
+              <span>Custom cover <em>(optional · single file)</em></span>
+              <input type="file" name="cover" id="cover" accept="image/jpeg,image/png,image/webp,image/gif,.jpg,.jpeg,.png,.webp,.gif" />
+            </label>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h2 class="panel-title">Typography</h2>
+          <div class="meta-row">
+            <label>
+              <span>Font</span>
+              <select name="font_stack" id="font_stack">
+                <option value="serif" selected>Serif (bookish)</option>
+                <option value="sans">Sans</option>
+              </select>
+            </label>
+            <label>
+              <span>Type size</span>
+              <select name="body_size" id="body_size">
+                <option value="small">Small</option>
+                <option value="medium" selected>Medium</option>
+                <option value="large">Large</option>
+              </select>
+            </label>
+          </div>
+          <div class="meta-row">
+            <label>
+              <span>Line height</span>
+              <input type="number" name="line_height" id="line_height" min="1.2" max="2" step="0.05" value="1.45" />
+            </label>
+            <label>
+              <span>Alignment</span>
+              <select name="text_align" id="text_align">
+                <option value="justify" selected>Justify</option>
+                <option value="left">Left</option>
+              </select>
+            </label>
+          </div>
+          <div class="meta-row">
+            <label>
+              <span>Page margin</span>
+              <select name="page_margin" id="page_margin">
+                <option value="tight">Tight</option>
+                <option value="normal" selected>Normal</option>
+                <option value="roomy">Roomy</option>
+              </select>
+            </label>
+            <label>
+              <span>Chapter breaks</span>
+              <select name="chapter_break_style" id="chapter_break_style">
+                <option value="page" selected>New page</option>
+                <option value="space">Spacing only</option>
+              </select>
+            </label>
+          </div>
+          <div class="toggle-row">
+            <label class="option compact">
+              <input type="checkbox" name="paragraph_indent" id="paragraph_indent" value="true" checked />
+              <span class="option-text"><strong>Paragraph indent</strong></span>
+            </label>
+            <label class="option compact">
+              <input type="checkbox" name="hyphenate" id="hyphenate" value="true" checked />
+              <span class="option-text"><strong>Hyphenation</strong></span>
+            </label>
+            <label class="option compact">
+              <input type="checkbox" name="page_break_chapters" id="page_break_chapters" value="true" checked />
+              <span class="option-text"><strong>Break before chapters</strong></span>
+            </label>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h2 class="panel-title">Images &amp; OCR</h2>
+          <label class="option">
+            <input type="checkbox" name="eink_images" id="eink_images" value="true" checked />
+            <span class="option-text">
+              <strong>E-ink image pass</strong>
+              <em>Greyscale + downscale figures for smaller device files</em>
+            </span>
+          </label>
+          <div class="meta-row options-row">
+            <label>
+              <span>Max image edge <em>(px)</em></span>
+              <input type="number" name="image_max_edge" id="image_max_edge" min="600" max="2000" step="50" value="1200" />
+            </label>
+            <label>
+              <span>Margin crop <em>(%)</em></span>
+              <input type="number" name="margin_crop" id="margin_crop" min="0" max="20" step="0.5" value="0" />
+            </label>
+          </div>
+          <label class="option {% if not ocr_available %}disabled{% endif %}">
+            <input type="checkbox" name="ocr" id="ocr" value="true" {% if not ocr_available %}disabled{% endif %} />
+            <span class="option-text">
+              <strong>OCR scanned pages</strong>
+              {% if ocr_available %}
+              <em>Local Tesseract · slower, for image-only PDFs</em>
+              {% else %}
+              <em>Install Tesseract (<code>brew install tesseract</code>) to enable</em>
+              {% endif %}
+            </span>
+          </label>
+          <div class="meta-row options-row">
+            <label>
+              <span>OCR language</span>
+              <select name="ocr_lang" id="ocr_lang" {% if not ocr_available %}disabled{% endif %}>
+                {% for lang in ocr_langs %}
+                <option value="{{ lang.code }}" {% if lang.code == "eng" %}selected{% endif %} {% if not lang.installed %}disabled{% endif %}>
+                  {{ lang.label }}{% if not lang.installed %} (not installed){% endif %}
+                </option>
+                {% endfor %}
+              </select>
+            </label>
+            <label class="spacer-label" aria-hidden="true"><span>&nbsp;</span><span class="ghost-field"></span></label>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button type="submit" class="btn primary" id="convert-btn" disabled>Convert to EPUB</button>
+          <button type="button" class="btn ghost" id="clear-btn" hidden>Clear</button>
+        </div>
+      </form>
+
+      <div class="status" id="status" hidden>
+        <div class="status-top">
+          <span class="status-label" id="status-label">Queued</span>
+          <span class="status-pct" id="status-pct">0%</span>
+        </div>
+        <div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="bar">
+          <div class="bar-fill" id="bar-fill"></div>
+        </div>
+        <p class="status-detail" id="status-detail"></p>
+        <div class="downloads" id="downloads"></div>
+        <a class="btn primary download is-disabled" id="download-btn" aria-disabled="true" tabindex="-1">Download EPUB</a>
+      </div>
+    </section>
+
+    <footer class="foot">
+      <p>Runs at <code>127.0.0.1</code> · no cloud upload · EPUB3 with NCX for wide reader support</p>
+    </footer>
+  </main>
+  <script src="/static/app.js"></script>
+</body>
+</html>
