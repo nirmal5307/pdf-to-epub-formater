@@ -1,16 +1,19 @@
 # Inkbound — Local PDF to EPUB Converter for E-Ink Readers
 
+**[🚀 Try Inkbound in your browser (creates a Codespace)](https://codespaces.new/nirmal5307/pdf-to-epub-formater?quickstart=1)**  
+No install — after it finishes loading, the app **starts automatically**.
+
 **Inkbound** is a free, open-source, **offline PDF to EPUB converter** built for e-ink devices.  
 Convert PDF books into reflowable **EPUB3** files tuned for **Kobo, Kindle, BOOX, PocketBook, Xteink X4**, and other e-readers — with **no cloud upload**.
 
 Drop a PDF → pick a reader profile → download an e-ink-friendly EPUB.  
 Also works from the command line for batch conversion.
 
+[![Open in GitHub Codespaces](https://img.shields.io/badge/Codespaces-Open%20%2F%20Create-blue?logo=github)](https://codespaces.new/nirmal5307/pdf-to-epub-formater?quickstart=1)
 [![License: MIT](https://img.shields.io/badge/License-MIT-teal.svg)](LICENSE)
 [![Python 3.11+](https://img.shields.io/badge/Python-3.11%2B-blue.svg)](https://www.python.org/)
 [![Runs locally](https://img.shields.io/badge/privacy-100%25%20local-success.svg)](#why-inkbound)
 [![EPUB3](https://img.shields.io/badge/output-EPUB3%20%2B%20NCX-informational.svg)](#features)
-[![Open in GitHub Codespaces](https://img.shields.io/badge/Codespaces-Open-blue?logo=github)](https://codespaces.new/nirmal5307/pdf-to-epub-formater?quickstart=1)
 
 ![Inkbound web UI — PDF to EPUB for e-ink](docs/screenshots/inkbound-home.jpg)
 
