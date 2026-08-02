@@ -48,11 +48,11 @@ Also works from the command line for batch conversion.
 
 ## Screenshots
 
-### Web UI
+### Web UI — reader profiles, typography, OCR
 
-![Inkbound homepage with reader profiles and typography controls](docs/screenshots/inkbound-home.jpg)
+![Inkbound full UI with reader profiles, typography, and OCR controls](docs/screenshots/inkbound-ui-full.jpg)
 
-> Tip: drop your own screenshots into `docs/screenshots/` (device photos, before/after EPUB, Kobo/Kindle sideload) and open a PR or commit them — real device shots help discovery a lot.
+> More shots welcome: drop device photos (Kobo / Kindle / Xteink with a converted EPUB) into `docs/screenshots/` — real e-ink photos help discovery a lot.
 
 ---
 
