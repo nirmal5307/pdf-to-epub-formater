@@ -56,6 +56,7 @@ class ExtractedBook:
     cover: ImageAsset | None = None
     language: str = "en"
     multi_column_pages: int = 0
+    image_only_pages: int = 0
     warnings: list[str] = field(default_factory=list)
 
 
@@ -373,13 +374,17 @@ def _is_structural_heading(text: str, book_title: str | None = None) -> bool:
     return _is_part_heading(text) or _is_trick_heading(text, book_title)
 
 
+def _page_char_count(page: fitz.Page) -> int:
+    return len((page.get_text("text") or "").strip())
+
+
 def _needs_ocr(page: fitz.Page, min_chars: int = 40) -> bool:
     """True when the page looks like a scan / image-only page."""
     chars = _page_char_count(page)
     if chars >= min_chars:
         return False
-    # Almost no text + has images → likely scan
-    return bool(page.get_images(full=True)) or chars < 8
+    # Sparse/no text + embedded images → likely a scan (not a blank page)
+    return bool(page.get_images(full=True))
 
 
 def _get_text_dict(
@@ -1093,6 +1098,7 @@ def extract_book(
         total = len(doc)
         ocr_pages = 0
         multi_column_pages = 0
+        image_only_pages = 0
 
         cover = _extract_cover(doc)
 
@@ -1111,8 +1117,17 @@ def extract_book(
                     progress(i + 1, total, "extracting")
                 continue
 
+            needs_ocr = _needs_ocr(page)
+            if needs_ocr:
+                image_only_pages += 1
+
             page_text = (page.get_text("text") or "").strip()
-            if _is_blank_or_promo(page_text) and len(page_text) < 220:
+            # Don't treat image-only scans as blank — they need OCR or the raster
+            if (
+                _is_blank_or_promo(page_text)
+                and len(page_text) < 220
+                and not needs_ocr
+            ):
                 # Still pull non-full-page images from mostly-blank pages
                 img_blocks = _extract_images_on_page(
                     doc, page, i, images, seen_xrefs, skip_full_page=False
@@ -1122,7 +1137,7 @@ def extract_book(
                     progress(i + 1, total, "extracting")
                 continue
 
-            use_ocr = bool(ocr and _needs_ocr(page))
+            use_ocr = bool(ocr and needs_ocr)
             data, used_ocr = _get_text_dict(page, use_ocr, ocr_lang=ocr_lang)
             if used_ocr:
                 ocr_pages += 1
@@ -1177,6 +1192,20 @@ def extract_book(
                 f"Detected multi-column layout on {multi_column_pages} page(s). "
                 "Reading order is best-effort — skim the EPUB on your reader."
             )
+        if not ocr and (
+            image_only_pages >= 2
+            or (image_only_pages >= 1 and total <= 8)
+        ):
+            if tesseract_available():
+                warnings.append(
+                    f"Detected {image_only_pages} image-only / scanned page(s). "
+                    "Enable OCR for better text extraction."
+                )
+            else:
+                warnings.append(
+                    f"Detected {image_only_pages} image-only / scanned page(s). "
+                    "Install Tesseract and enable OCR for better text extraction."
+                )
 
         return ExtractedBook(
             title=title,
@@ -1187,6 +1216,7 @@ def extract_book(
             ocr_pages=ocr_pages,
             cover=cover,
             multi_column_pages=multi_column_pages,
+            image_only_pages=image_only_pages,
             warnings=warnings,
         )
     finally:

@@ -19,6 +19,7 @@ class ConvertResult:
     path: Path
     warnings: list[str] = field(default_factory=list)
     multi_column_pages: int = 0
+    image_only_pages: int = 0
 
     def __str__(self) -> str:
         return str(self.path)
@@ -111,4 +112,5 @@ def convert_pdf_to_epub(
         path=path,
         warnings=list(book.warnings),
         multi_column_pages=book.multi_column_pages,
+        image_only_pages=book.image_only_pages,
     )
