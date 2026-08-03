@@ -31,7 +31,7 @@ class ImageAsset:
 class Block:
     """A content block: paragraph, heading, or image reference."""
 
-    kind: str  # "p" | "h1" | "h2" | "h3" | "img"
+    kind: str  # "p" | "h1" | "h2" | "h3" | "img" | "caption"
     text: str = ""
     image_id: str | None = None
     page: int = 0
@@ -55,6 +55,8 @@ class ExtractedBook:
     ocr_pages: int = 0
     cover: ImageAsset | None = None
     language: str = "en"
+    multi_column_pages: int = 0
+    warnings: list[str] = field(default_factory=list)
 
 
 _HEADER_FOOTER_RE = re.compile(
@@ -543,6 +545,12 @@ def _is_chrome(text: str, y0: float, page_height: float, repeated: set[str]) -> 
     return False
 
 
+_CAPTION_RE = re.compile(
+    r"^(?:fig(?:ure|\.)?|table|abb(?:ildung)?\.?|figura|tableau|cuadro)\b",
+    re.IGNORECASE,
+)
+
+
 def _column_key(x0: float, page_width: float, two_col: bool) -> int:
     if not two_col:
         return 0
@@ -550,13 +558,79 @@ def _column_key(x0: float, page_width: float, two_col: bool) -> int:
 
 
 def _detect_two_column(raw_blocks: list[tuple[float, float, Block]], page_width: float) -> bool:
-    """Heuristic: enough left and right blocks with a gap in the middle."""
-    if len(raw_blocks) < 6:
+    """
+    Heuristic: left + right text clusters with a sparse middle gutter.
+
+    Also requires a visible gap between the rightmost left-block and leftmost
+    right-block so single-column indented layouts are less likely to match.
+    """
+    text = [(x, y, b) for x, y, b in raw_blocks if b.kind != "img" and (b.text or "").strip()]
+    if len(text) < 6:
         return False
-    left = sum(1 for x, _, _ in raw_blocks if x < page_width * 0.40)
-    right = sum(1 for x, _, _ in raw_blocks if x > page_width * 0.52)
-    mid = sum(1 for x, _, b in raw_blocks if page_width * 0.40 <= x <= page_width * 0.52 and b.kind == "p")
-    return left >= 3 and right >= 3 and mid <= max(2, (left + right) // 6)
+    left = [(x, y, b) for x, y, b in text if x < page_width * 0.40]
+    right = [(x, y, b) for x, y, b in text if x > page_width * 0.52]
+    mid = [
+        (x, y, b)
+        for x, y, b in text
+        if page_width * 0.40 <= x <= page_width * 0.52 and b.kind == "p"
+    ]
+    if not (len(left) >= 3 and len(right) >= 3 and len(mid) <= max(2, (len(left) + len(right)) // 6)):
+        return False
+    left_edge = max(x for x, _, _ in left)
+    right_edge = min(x for x, _, _ in right)
+    gutter = right_edge - left_edge
+    return gutter >= page_width * 0.06
+
+
+def _looks_like_caption(text: str) -> bool:
+    t = text.strip()
+    if not t or len(t) > 180:
+        return False
+    if _CAPTION_RE.match(t):
+        return True
+    words = t.split()
+    # Short label under a figure without a long prose sentence
+    return 2 <= len(words) <= 16 and not t.endswith(".")
+
+
+def _attach_captions(blocks: list[Block]) -> list[Block]:
+    """Keep short caption lines immediately after their figure on the same page."""
+    if len(blocks) < 2:
+        return blocks
+    used: set[int] = set()
+    out: list[Block] = []
+    for i, b in enumerate(blocks):
+        if i in used:
+            continue
+        out.append(b)
+        if b.kind != "img":
+            continue
+        best_j = None
+        best_dy = None
+        for j in range(i + 1, min(i + 6, len(blocks))):
+            if j in used:
+                continue
+            cand = blocks[j]
+            if cand.kind == "img" or cand.page != b.page:
+                break
+            if cand.kind not in {"p", "h3"}:
+                continue
+            dy = cand.y - b.y
+            if dy < -8 or dy > 140:
+                continue
+            if abs(cand.x - b.x) > 120:
+                continue
+            if not _looks_like_caption(cand.text):
+                continue
+            if best_dy is None or dy < best_dy:
+                best_dy = dy
+                best_j = j
+        if best_j is not None:
+            cap = blocks[best_j]
+            cap.kind = "caption"
+            out.append(cap)
+            used.add(best_j)
+    return out
 
 
 def _merge_paragraphs(blocks: list[Block]) -> list[Block]:
@@ -1018,6 +1092,7 @@ def extract_book(
         all_blocks: list[Block] = []
         total = len(doc)
         ocr_pages = 0
+        multi_column_pages = 0
 
         cover = _extract_cover(doc)
 
@@ -1076,14 +1151,17 @@ def extract_book(
             two_col = _detect_two_column(
                 [(b.x, b.y, b) for b in text_blocks], page_width
             )
+            if two_col:
+                multi_column_pages += 1
             page_blocks.sort(
                 key=lambda b: (
                     _column_key(b.x, page_width, two_col),
                     b.y,
-                    0 if b.kind != "img" else 1,
+                    0 if b.kind == "img" else 1,
                     b.x,
                 )
             )
+            page_blocks = _attach_captions(page_blocks)
             all_blocks.extend(page_blocks)
 
             if progress and (i % 3 == 0 or i == total - 1):
@@ -1091,6 +1169,14 @@ def extract_book(
 
         toc = _chapters_from_toc(doc)
         chapters = _split_into_chapters(all_blocks, toc, title, page_count=total)
+        warnings: list[str] = []
+        if multi_column_pages >= 2 or (
+            multi_column_pages >= 1 and total <= 8
+        ):
+            warnings.append(
+                f"Detected multi-column layout on {multi_column_pages} page(s). "
+                "Reading order is best-effort — skim the EPUB on your reader."
+            )
 
         return ExtractedBook(
             title=title,
@@ -1100,6 +1186,8 @@ def extract_book(
             page_count=total,
             ocr_pages=ocr_pages,
             cover=cover,
+            multi_column_pages=multi_column_pages,
+            warnings=warnings,
         )
     finally:
         doc.close()

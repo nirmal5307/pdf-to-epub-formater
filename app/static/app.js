@@ -302,21 +302,33 @@
     });
   }
 
+  function collectWarnings(jobs) {
+    const notes = [];
+    (jobs || []).forEach((j) => {
+      (j.warnings || []).forEach((w) => {
+        if (w) notes.push(jobs.length > 1 ? `${j.filename}: ${w}` : w);
+      });
+    });
+    return notes;
+  }
+
   function renderBatch(batch) {
     statusEl.hidden = false;
     statusEl.classList.toggle("error", batch.status === "error");
+    const jobs = batch.jobs || [];
+    const warnings = collectWarnings(jobs);
+    statusEl.classList.toggle("warn", Boolean(warnings.length) && batch.status !== "error");
     statusLabel.textContent = batch.status === "done" ? "Done" : batch.status;
     statusPct.textContent = `${batch.progress || 0}%`;
     bar.setAttribute("aria-valuenow", String(batch.progress || 0));
     barFill.style.width = `${batch.progress || 0}%`;
 
-    const jobs = batch.jobs || [];
     const detailBits = jobs.map((j) => {
       if (j.status === "done") return `${j.filename}: ready`;
       if (j.status === "error") return `${j.filename}: ${j.error || "failed"}`;
       return `${j.filename}: ${stageCopy(j.stage, j.progress)}`;
     });
-    statusDetail.textContent =
+    let detail =
       jobs.length > 1
         ? detailBits.join(" · ")
         : batch.status === "error"
@@ -325,6 +337,10 @@
               (jobs[0] && jobs[0].stage) || batch.status,
               (jobs[0] && jobs[0].progress) || batch.progress
             );
+    if (warnings.length && batch.status !== "error") {
+      detail = detail ? `${detail} ${warnings.join(" ")}` : warnings.join(" ");
+    }
+    statusDetail.textContent = detail;
 
     renderDownloads(jobs);
 

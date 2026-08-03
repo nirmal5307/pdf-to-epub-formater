@@ -154,6 +154,8 @@ def _block_to_html(block, first_para: bool) -> tuple[str, bool]:
         return f"<h2>{text}</h2>\n", True
     if block.kind == "h3":
         return f"<h3>{text}</h3>\n", True
+    if block.kind == "caption":
+        return f'<p class="caption">{text}</p>\n', True
 
     cls = ' class="first"' if first_para else ""
     return f"<p{cls}>{text}</p>\n", False

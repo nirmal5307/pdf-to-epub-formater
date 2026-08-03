@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Callable
 
@@ -13,6 +14,19 @@ from .pdf_extract import ImageAsset, extract_book
 ProgressCb = Callable[[int, int, str], None]
 
 
+@dataclass
+class ConvertResult:
+    path: Path
+    warnings: list[str] = field(default_factory=list)
+    multi_column_pages: int = 0
+
+    def __str__(self) -> str:
+        return str(self.path)
+
+    def __fspath__(self) -> str:
+        return str(self.path)
+
+
 def convert_pdf_to_epub(
     pdf_path: str | Path,
     output_path: str | Path | None = None,
@@ -22,7 +36,7 @@ def convert_pdf_to_epub(
     ocr: bool = False,
     *,
     options: ConvertOptions | None = None,
-) -> Path:
+) -> ConvertResult:
     """
     Convert a PDF file into an e-ink-friendly EPUB.
 
@@ -92,4 +106,9 @@ def convert_pdf_to_epub(
             max_edge=max(opts.image_max_edge, 1400),
         )
 
-    return build_epub(book, output_path, progress=progress, options=opts)
+    path = build_epub(book, output_path, progress=progress, options=opts)
+    return ConvertResult(
+        path=path,
+        warnings=list(book.warnings),
+        multi_column_pages=book.multi_column_pages,
+    )

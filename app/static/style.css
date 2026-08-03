@@ -527,6 +527,10 @@ a.download.is-disabled {
   background: var(--danger);
 }
 
+.status.warn .status-detail {
+  color: color-mix(in srgb, var(--accent) 70%, var(--ink));
+}
+
 .download {
   margin-top: 1.1rem;
 }

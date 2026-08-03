@@ -178,7 +178,9 @@ def main(argv: list[str] | None = None) -> int:
                 progress=progress,
                 options=opts,
             )
-            print(f"\nWrote {result}")
+            print(f"\nWrote {result.path}")
+            for warning in result.warnings:
+                print(f"Note: {warning}", file=sys.stderr)
     except OcrUnavailableError as exc:
         print(f"\n{exc}", file=sys.stderr)
         return 2

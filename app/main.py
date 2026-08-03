@@ -333,6 +333,7 @@ async def convert(
             "filename": filename,
             "epub_name": f"{safe_stem}.epub",
             "error": None,
+            "warnings": [],
             "pdf_path": str(pdf_path),
             "epub_path": str(epub_path),
         }
@@ -359,7 +360,7 @@ def _run_convert(
         job["progress"] = int(100 * current / max(total, 1))
 
     try:
-        convert_pdf_to_epub(
+        result = convert_pdf_to_epub(
             pdf_path,
             output_path=epub_path,
             progress=progress,
@@ -368,6 +369,7 @@ def _run_convert(
         job["status"] = "done"
         job["progress"] = 100
         job["stage"] = "done"
+        job["warnings"] = list(result.warnings)
     except Exception as exc:  # noqa: BLE001
         job["status"] = "error"
         job["error"] = str(exc)
@@ -389,6 +391,7 @@ def _job_payload(job: dict) -> dict:
         "filename": job["filename"],
         "epub_name": job["epub_name"],
         "error": job["error"],
+        "warnings": list(job.get("warnings") or []),
         "download_url": f"/api/download/{job['id']}" if job["status"] == "done" else None,
     }
 
