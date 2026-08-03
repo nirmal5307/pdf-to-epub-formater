@@ -149,6 +149,12 @@ python -m app.cli book.pdf -o book.epub
 # Batch
 python -m app.cli a.pdf b.pdf c.pdf
 
+# Entire folder (same profile for every PDF)
+python -m app.cli ./my-pdfs/ --output-dir ./epubs/ --reader-profile kobo
+
+# Folder + nested subfolders
+python -m app.cli ./library/ -r --output-dir ./epubs/
+
 # Scanned PDF → OCR
 python -m app.cli scan.pdf --ocr --ocr-lang eng --margin-crop 4
 
@@ -237,7 +243,8 @@ Open an [issue](https://github.com/nirmal5307/pdf-to-epub-formater/issues) or pu
 - More UI languages (beyond English)  
 - Language pack contribution guide + sample PDFs  
 - OCR confidence preview / image-only page detection  
-- Folder convert & watch-folder workflow  
+- Watch-folder auto-convert  
+- Re-download past conversion jobs  
 - Footnotes, tables, and poetry line breaks  
 
 Optional **Embed fonts** (EB Garamond / Source Sans 3 Latin subsets, SIL OFL) is available in Typography for stubborn readers.

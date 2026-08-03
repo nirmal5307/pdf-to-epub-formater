@@ -15,17 +15,66 @@ from app.converter.options import READER_PROFILES, ConvertOptions  # noqa: E402
 from app.converter.pdf_extract import OcrUnavailableError, tesseract_available  # noqa: E402
 
 
+def collect_pdfs(paths: list[Path], *, recursive: bool = False) -> list[Path]:
+    """Expand file and folder paths into a de-duplicated list of PDF files."""
+    found: list[Path] = []
+    seen: set[Path] = set()
+
+    def add(pdf: Path) -> None:
+        key = pdf.resolve()
+        if key in seen:
+            return
+        seen.add(key)
+        found.append(pdf)
+
+    for raw in paths:
+        path = Path(raw)
+        if path.is_file():
+            if path.suffix.lower() != ".pdf":
+                raise ValueError(f"Not a PDF: {path}")
+            add(path)
+            continue
+        if path.is_dir():
+            pattern = "**/*.pdf" if recursive else "*.pdf"
+            matches = sorted(p for p in path.glob(pattern) if p.is_file())
+            if not matches:
+                raise ValueError(f"No PDF files found in folder: {path}")
+            for pdf in matches:
+                add(pdf)
+            continue
+        raise ValueError(f"Path not found: {path}")
+
+    return found
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
-        description="Convert PDF(s) into e-ink-friendly EPUB(s)."
+        description="Convert PDF(s) or folders of PDFs into e-ink-friendly EPUB(s)."
     )
-    parser.add_argument("pdf", type=Path, nargs="+", help="Input PDF path(s)")
+    parser.add_argument(
+        "pdf",
+        type=Path,
+        nargs="+",
+        help="Input PDF path(s) and/or folder(s) containing PDFs",
+    )
     parser.add_argument(
         "-o",
         "--output",
         type=Path,
         default=None,
         help="Output EPUB path (single file only)",
+    )
+    parser.add_argument(
+        "--output-dir",
+        type=Path,
+        default=None,
+        help="Directory for EPUB outputs (folder / multi-file convert)",
+    )
+    parser.add_argument(
+        "-r",
+        "--recursive",
+        action="store_true",
+        help="Include PDFs in subfolders when a folder is given",
     )
     parser.add_argument("--title", default=None, help="Override book title (single file)")
     parser.add_argument("--author", default=None, help="Override author")
@@ -127,18 +176,30 @@ def main(argv: list[str] | None = None) -> int:
         )
         return 2
 
-    if args.output and len(args.pdf) > 1:
+    try:
+        pdfs = collect_pdfs(list(args.pdf), recursive=args.recursive)
+    except ValueError as exc:
+        print(str(exc), file=sys.stderr)
+        return 2
+
+    if args.output and len(pdfs) > 1:
         print("Use -o only with a single input PDF.", file=sys.stderr)
+        return 2
+    if args.output and args.output_dir:
+        print("Use either -o or --output-dir, not both.", file=sys.stderr)
         return 2
 
     cover_bytes = None
     cover_ext = "jpeg"
     if args.cover:
-        if len(args.pdf) > 1:
+        if len(pdfs) > 1:
             print("Custom --cover only works with a single PDF.", file=sys.stderr)
             return 2
         cover_bytes = args.cover.read_bytes()
         cover_ext = args.cover.suffix.lstrip(".").lower() or "jpeg"
+
+    if args.output_dir is not None:
+        args.output_dir.mkdir(parents=True, exist_ok=True)
 
     profile = READER_PROFILES.get(args.reader_profile, READER_PROFILES["universal"])
     defaults = dict(profile["defaults"])
@@ -152,10 +213,14 @@ def main(argv: list[str] | None = None) -> int:
         pct = int(100 * current / max(total, 1))
         print(f"\r[{stage}] {pct}% ({current}/{total})", end="", flush=True)
 
+    failures = 0
+    single = len(pdfs) == 1
     try:
-        for pdf in args.pdf:
+        for index, pdf in enumerate(pdfs, start=1):
+            if len(pdfs) > 1:
+                print(f"\n[{index}/{len(pdfs)}] {pdf.name}", flush=True)
             opts = ConvertOptions(
-                title=args.title if len(args.pdf) == 1 else None,
+                title=args.title if single else None,
                 author=args.author,
                 language=args.language,
                 ocr=args.ocr,
@@ -177,13 +242,25 @@ def main(argv: list[str] | None = None) -> int:
                 image_max_edge=pick(args.image_max_edge, "image_max_edge", int),
                 chapter_break_style=args.chapter_break_style or "page",
             ).normalized()
-            out = args.output if len(args.pdf) == 1 else pdf.with_suffix(".epub")
-            result = convert_pdf_to_epub(
-                pdf,
-                output_path=out,
-                progress=progress,
-                options=opts,
-            )
+            if args.output is not None:
+                out = args.output
+            elif args.output_dir is not None:
+                out = args.output_dir / f"{pdf.stem}.epub"
+            else:
+                out = pdf.with_suffix(".epub")
+            try:
+                result = convert_pdf_to_epub(
+                    pdf,
+                    output_path=out,
+                    progress=progress,
+                    options=opts,
+                )
+            except OcrUnavailableError:
+                raise
+            except Exception as exc:  # noqa: BLE001
+                failures += 1
+                print(f"\nFailed {pdf}: {exc}", file=sys.stderr)
+                continue
             print(f"\nWrote {result.path}")
             for warning in result.warnings:
                 print(f"Note: {warning}", file=sys.stderr)
@@ -191,6 +268,9 @@ def main(argv: list[str] | None = None) -> int:
         print(f"\n{exc}", file=sys.stderr)
         return 2
 
+    if failures:
+        print(f"\nFinished with {failures} failure(s).", file=sys.stderr)
+        return 1
     return 0
 
 
