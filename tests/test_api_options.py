@@ -3,13 +3,15 @@
 from __future__ import annotations
 
 import time
+import zipfile
 from pathlib import Path
 
 import pytest
 from fastapi.testclient import TestClient
 
-from app.converter.epub_builder import build_eink_css
+from app.converter.epub_builder import build_eink_css, build_epub
 from app.converter.options import ConvertOptions
+from app.converter.pdf_extract import Block, Chapter, ExtractedBook
 from app.main import app
 
 
@@ -38,6 +40,31 @@ def test_css_roomy_margins_and_indent():
     assert "0.9em 1.1em 1.5em" in css
     assert "text-indent: 1.2em" in css
     assert "Helvetica Neue" in css
+
+
+def test_embed_fonts_css_and_epub_package(tmp_path: Path):
+    css = build_eink_css(ConvertOptions(embed_fonts=True, font_stack="serif"))
+    assert "@font-face" in css
+    assert "InkboundSerif" in css
+    assert "EBGaramond-Regular.ttf" in css
+
+    book = ExtractedBook(
+        title="Font Sample",
+        author="Tester",
+        chapters=[
+            Chapter(
+                title="One",
+                blocks=[Block(kind="p", text="Embedded font body text.", page=1)],
+            )
+        ],
+        images={},
+        page_count=1,
+    )
+    out = tmp_path / "font-sample.epub"
+    build_epub(book, out, options=ConvertOptions(embed_fonts=True, font_stack="serif"))
+    with zipfile.ZipFile(out) as zf:
+        names = zf.namelist()
+    assert any(n.endswith("fonts/EBGaramond-Regular.ttf") for n in names)
 
 
 def test_capabilities_lists_profiles(client):

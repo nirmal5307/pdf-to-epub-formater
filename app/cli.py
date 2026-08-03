@@ -84,6 +84,11 @@ def main(argv: list[str] | None = None) -> int:
         help="Preferred font stack",
     )
     parser.add_argument(
+        "--embed-fonts",
+        action="store_true",
+        help="Embed a Latin font subset (helps stubborn readers that ignore CSS stacks)",
+    )
+    parser.add_argument(
         "--page-margin",
         choices=["tight", "normal", "roomy"],
         default=None,
@@ -167,6 +172,7 @@ def main(argv: list[str] | None = None) -> int:
                 hyphenate=False if args.no_hyphenate else bool(defaults["hyphenate"]),
                 page_break_chapters=bool(defaults["page_break_chapters"]),
                 font_stack=pick(args.font_stack, "font_stack"),
+                embed_fonts=bool(args.embed_fonts),
                 page_margin=pick(args.page_margin, "page_margin"),
                 image_max_edge=pick(args.image_max_edge, "image_max_edge", int),
                 chapter_break_style=args.chapter_break_style or "page",

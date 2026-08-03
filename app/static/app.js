@@ -58,6 +58,7 @@
       hyphenate: document.getElementById("hyphenate").checked,
       paragraph_indent: document.getElementById("paragraph_indent").checked,
       font_stack: document.getElementById("font_stack").value,
+      embed_fonts: document.getElementById("embed_fonts").checked,
       page_break_chapters: document.getElementById("page_break_chapters").checked,
       image_max_edge: document.getElementById("image_max_edge").value,
       chapter_break_style: document.getElementById("chapter_break_style").value,
@@ -425,6 +426,7 @@
     appendBool(data, "paragraph_indent", "paragraph_indent", true);
     appendBool(data, "hyphenate", "hyphenate", true);
     appendBool(data, "page_break_chapters", "page_break_chapters", true);
+    appendBool(data, "embed_fonts", "embed_fonts", false);
 
     const coverInput = document.getElementById("cover");
     if (coverInput && coverInput.files && coverInput.files[0] && selectedFiles.length === 1) {

@@ -235,10 +235,12 @@ Open an [issue](https://github.com/nirmal5307/pdf-to-epub-formater/issues) or pu
 ## Roadmap
 
 - More UI languages (beyond English)  
-- Stronger non-English chapter / Part detection  
-- More reader presets (Tolino, etc.)  
-- Optional embedded fonts for stubborn devices  
-- Better multi-column academic PDF handling  
+- Language pack contribution guide + sample PDFs  
+- OCR confidence preview / image-only page detection  
+- Folder convert & watch-folder workflow  
+- Footnotes, tables, and poetry line breaks  
+
+Optional **Embed fonts** (EB Garamond / Source Sans 3 Latin subsets, SIL OFL) is available in Typography for stubborn readers.
 
 ---
 
@@ -248,7 +250,7 @@ Participation is covered by our [Code of Conduct](CODE_OF_CONDUCT.md).
 
 ## License
 
-[MIT](LICENSE) — free to use, modify, and share.
+[MIT](LICENSE) — free to use, modify, and share. Optional embedded fonts under `app/assets/fonts/` remain SIL OFL 1.1 (see licenses there).
 
 ---
 

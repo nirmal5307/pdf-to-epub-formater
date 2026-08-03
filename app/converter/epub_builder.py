@@ -20,10 +20,40 @@ SANS_STACK = (
     '"Helvetica Neue", Helvetica, Arial, "Noto Sans", sans-serif'
 )
 
+_FONTS_DIR = Path(__file__).resolve().parent.parent / "assets" / "fonts"
+_EMBEDDED_FONTS = {
+    "serif": {
+        "family": "InkboundSerif",
+        "file": "EBGaramond-Regular.ttf",
+    },
+    "sans": {
+        "family": "InkboundSans",
+        "file": "SourceSans3-Regular.ttf",
+    },
+}
+
+
+def _embedded_font_meta(font_stack: str) -> dict[str, str] | None:
+    return _EMBEDDED_FONTS.get(font_stack if font_stack in _EMBEDDED_FONTS else "serif")
+
 
 def build_eink_css(options: ConvertOptions | None = None) -> str:
     opts = (options or ConvertOptions()).normalized()
     font = SERIF_STACK if opts.font_stack == "serif" else SANS_STACK
+    face_css = ""
+    if opts.embed_fonts:
+        meta = _embedded_font_meta(opts.font_stack)
+        font_path = _FONTS_DIR / meta["file"] if meta else None
+        if meta and font_path is not None and font_path.is_file():
+            face_css = f"""
+@font-face {{
+  font-family: "{meta["family"]}";
+  src: url("../fonts/{meta["file"]}");
+  font-weight: normal;
+  font-style: normal;
+}}
+"""
+            font = f'"{meta["family"]}", {font}'
     size = BODY_SIZES.get(opts.body_size, "1em")
     padding = MARGIN_PRESETS.get(opts.page_margin, MARGIN_PRESETS["normal"])
     align = "justify" if opts.text_align == "justify" else "left"
@@ -37,7 +67,7 @@ def build_eink_css(options: ConvertOptions | None = None) -> str:
 
     return f"""
 @charset "UTF-8";
-
+{face_css}
 html {{
   -webkit-text-size-adjust: 100%;
 }}
@@ -212,6 +242,19 @@ def build_epub(
         content=build_eink_css(opts).encode("utf-8"),
     )
     epub_book.add_item(css_item)
+
+    if opts.embed_fonts:
+        meta = _embedded_font_meta(opts.font_stack)
+        font_path = _FONTS_DIR / meta["file"] if meta else None
+        if meta and font_path is not None and font_path.is_file():
+            epub_book.add_item(
+                epub.EpubItem(
+                    uid="font_body",
+                    file_name=f"fonts/{meta['file']}",
+                    media_type="application/font-sfnt",
+                    content=font_path.read_bytes(),
+                )
+            )
 
     cover_spine = None
     if book.cover is not None:

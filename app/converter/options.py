@@ -153,6 +153,7 @@ class ConvertOptions:
     hyphenate: bool = True
     page_break_chapters: bool = True
     font_stack: str = "serif"
+    embed_fonts: bool = False
     page_margin: str = "normal"
     image_max_edge: int = 1200
     chapter_break_style: str = "page"
@@ -178,6 +179,7 @@ class ConvertOptions:
             hyphenate=bool(self.hyphenate),
             page_break_chapters=bool(self.page_break_chapters),
             font_stack=self.font_stack if self.font_stack in {"serif", "sans"} else "serif",
+            embed_fonts=bool(self.embed_fonts),
             page_margin=self.page_margin if self.page_margin in MARGIN_PRESETS else "normal",
             image_max_edge=max(600, min(int(self.image_max_edge or 1200), 2000)),
             chapter_break_style=self.chapter_break_style
