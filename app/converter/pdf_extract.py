@@ -62,18 +62,45 @@ _HEADER_FOOTER_RE = re.compile(
     r"chapter\s+\d+|copyright\s*.*|©.*)$",
     re.IGNORECASE,
 )
+# English + common EU chapter/part words (Inkbound is English-first; more languages welcome)
+_CHAPTER_WORD = (
+    r"chapter|part|section|book|"
+    r"chapitre|partie|section|livre|"  # FR
+    r"kapitel|teil|abschnitt|buch|"  # DE
+    r"cap[ií]tulo|parte|secci[oó]n|libro|"  # ES
+    r"capitolo|parte|sezione|libro|"  # IT
+    r"cap[ií]tulo|parte|se[cç][aã]o|livro|"  # PT
+    r"hoofdstuk|deel|sectie|boek"  # NL
+)
+_ORDINAL_WORD = (
+    r"one|two|three|four|five|six|seven|eight|nine|ten|"
+    r"un|une|deux|trois|quatre|cinq|six|sept|huit|neuf|dix|"
+    r"eins|zwei|drei|vier|f[uü]nf|sechs|sieben|acht|neun|zehn|"
+    r"erste[rn]?|zweite[rn]?|dritte[rn]?|"
+    r"uno|una|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez|"
+    r"due|tre|quattro|cinque|sette|otto|nove|dieci|"
+    r"um|uma|dois|duas|tr[eê]s|quatro|cinco|seis|sete|oito|nove|dez|"
+    r"een|twee|drie|vier|vijf|zes|zeven|acht|negen|tien"
+)
 _CHAPTER_TITLE_RE = re.compile(
-    r"^(?:chapter|part|section|book)\s+[\wivxlcdm\d]+(?:\s*[:.\-–—].*)?$",
+    rf"^(?:{_CHAPTER_WORD})\s+[\wivxlcdm\d]+(?:\s*[:.\-–—].*)?$",
     re.IGNORECASE,
 )
 _PART_TITLE_RE = re.compile(
-    r"^part\s+(?:one|two|three|four|five|six|seven|eight|nine|ten|[\divxlcdm\d]+)(?:\s*[:.\-–—].*)?$",
+    rf"^(?:part|partie|teil|parte|deel)\s+"
+    rf"(?:{_ORDINAL_WORD}|[\divxlcdm\d]+)(?:\s*[:.\-–—].*)?$",
     re.IGNORECASE,
 )
 _SKIP_TOC_RE = re.compile(
     r"^(?:cover|title(?:\s*page)?|half[\s\-]?title|copyright|dedication|"
     r"also by|about the author|image|illustration|photo|plate|"
-    r"this page intentionally left blank|blank)$",
+    r"this page intentionally left blank|blank|"
+    r"couverture|titre|d[eé]dicace|"  # FR
+    r"umschlag|titel|widmung|"  # DE
+    r"portada|t[ií]tulo|dedicatoria|"  # ES
+    r"copertina|titolo|dedica|"  # IT
+    r"capa|t[ií]tulo|dedicat[oó]ria|"  # PT
+    r"omslag|titel|opdracht)$",  # NL
     re.IGNORECASE,
 )
 _BLANK_OR_PROMO_RE = re.compile(
@@ -92,9 +119,10 @@ _ZLIB_PAREN_RE = re.compile(
     re.IGNORECASE,
 )
 _DECORATIVE_RE = re.compile(r"^[\W\d_*✰☆★■□▪▫●○•·\-–—…\.]+$", re.UNICODE)
-_HOW_TO_RE = re.compile(r"^how\s+to\b.+", re.IGNORECASE)
+_HOW_TO_LEAD = r"(?:how\s+to|comment|c[oó]mo|wie\s+(?:man|sie)|come|como)\b"
+_HOW_TO_RE = re.compile(rf"^{_HOW_TO_LEAD}.+", re.IGNORECASE)
 _NUMBERED_HOW_TO_RE = re.compile(
-    r"^\d{1,3}[\.\):\s]+(how\s+to\b.+)$",
+    rf"^\d{{1,3}}[\.\):\s]+({_HOW_TO_LEAD}.+)$",
     re.IGNORECASE,
 )
 

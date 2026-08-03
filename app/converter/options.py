@@ -9,6 +9,7 @@ READER_PROFILES = {
     "universal": {
         "label": "Universal e-ink",
         "hint": "Safe defaults for Xteink, Kobo, Kindle, Boox, PocketBook",
+        "tip": "Best starting point. Justifies text, medium type, and balanced image size for most sideload apps.",
         "defaults": {
             "body_size": "medium",
             "line_height": "1.45",
@@ -24,6 +25,7 @@ READER_PROFILES = {
     "kobo": {
         "label": "Kobo",
         "hint": "Comfortable margins and hyphenation for Kobo EPUB",
+        "tip": "Roomier margins + hyphenation — works well with Kobo’s reflow and sideloaded EPUB.",
         "defaults": {
             "body_size": "medium",
             "line_height": "1.5",
@@ -39,6 +41,7 @@ READER_PROFILES = {
     "kindle": {
         "label": "Kindle",
         "hint": "Simpler CSS tuned for Kindle EPUB sideload",
+        "tip": "Left-aligned, no hyphenation, slightly smaller images — kinder to Kindle’s EPUB engine.",
         "defaults": {
             "body_size": "medium",
             "line_height": "1.4",
@@ -54,6 +57,7 @@ READER_PROFILES = {
     "boox": {
         "label": "BOOX / Android",
         "hint": "Slightly larger type for Android e-ink devices",
+        "tip": "Larger type and bigger image budget for Android e-ink apps (NeoReader, etc.).",
         "defaults": {
             "body_size": "large",
             "line_height": "1.5",
@@ -66,9 +70,26 @@ READER_PROFILES = {
             "image_max_edge": "1400",
         },
     },
+    "tolino": {
+        "label": "Tolino",
+        "hint": "Comfortable German/EU Tolino EPUB defaults",
+        "tip": "Justify + hyphenation with roomy margins — a solid default for Tolino sideload.",
+        "defaults": {
+            "body_size": "medium",
+            "line_height": "1.5",
+            "text_align": "justify",
+            "page_margin": "roomy",
+            "hyphenate": True,
+            "paragraph_indent": True,
+            "font_stack": "serif",
+            "page_break_chapters": True,
+            "image_max_edge": "1200",
+        },
+    },
     "compact": {
         "label": "Compact / small screens",
         "hint": "Tighter margins for smaller panels",
+        "tip": "Tighter margins and smaller type for Xteink-class / small panels — more words per page.",
         "defaults": {
             "body_size": "small",
             "line_height": "1.35",
@@ -79,6 +100,22 @@ READER_PROFILES = {
             "font_stack": "serif",
             "page_break_chapters": True,
             "image_max_edge": "900",
+        },
+    },
+    "comfort": {
+        "label": "Large type / comfort",
+        "hint": "Bigger type and spacing for easier reading",
+        "tip": "One-click comfort: large type, roomy margins, open line height — great for long sessions.",
+        "defaults": {
+            "body_size": "large",
+            "line_height": "1.6",
+            "text_align": "left",
+            "page_margin": "roomy",
+            "hyphenate": False,
+            "paragraph_indent": False,
+            "font_stack": "sans",
+            "page_break_chapters": True,
+            "image_max_edge": "1100",
         },
     },
 }

@@ -17,7 +17,12 @@
   const ocrLangEl = document.getElementById("ocr_lang");
   const profileInput = document.getElementById("reader_profile");
   const profileHint = document.getElementById("profile-hint");
+  const profileTip = document.getElementById("profile-tip");
   const profileGrid = document.getElementById("profile-grid");
+  const savedProfilesEl = document.getElementById("saved-profiles");
+  const saveProfileBtn = document.getElementById("save-profile-btn");
+  const deleteProfileBtn = document.getElementById("delete-profile-btn");
+  const SAVED_KEY = "inkbound.savedProfiles.v1";
 
   let selectedFiles = [];
   let pollTimer = null;
@@ -43,21 +48,80 @@
     }
   }
 
-  function applyProfile(id) {
+  function readSettings() {
+    return {
+      reader_profile: profileInput.value || "universal",
+      body_size: document.getElementById("body_size").value,
+      line_height: document.getElementById("line_height").value,
+      text_align: document.getElementById("text_align").value,
+      page_margin: document.getElementById("page_margin").value,
+      hyphenate: document.getElementById("hyphenate").checked,
+      paragraph_indent: document.getElementById("paragraph_indent").checked,
+      font_stack: document.getElementById("font_stack").value,
+      page_break_chapters: document.getElementById("page_break_chapters").checked,
+      image_max_edge: document.getElementById("image_max_edge").value,
+      chapter_break_style: document.getElementById("chapter_break_style").value,
+      eink_images: document.getElementById("eink_images").checked,
+      margin_crop: document.getElementById("margin_crop").value,
+      language: document.getElementById("language").value,
+    };
+  }
+
+  function applySettings(settings) {
+    if (!settings) return;
+    if (settings.reader_profile) applyProfile(settings.reader_profile, false);
+    Object.entries(settings).forEach(([key, value]) => {
+      if (key === "reader_profile") return;
+      setFieldValue(key, value);
+    });
+  }
+
+  function loadSavedMap() {
+    try {
+      return JSON.parse(localStorage.getItem(SAVED_KEY) || "{}") || {};
+    } catch (_) {
+      return {};
+    }
+  }
+
+  function persistSavedMap(map) {
+    localStorage.setItem(SAVED_KEY, JSON.stringify(map));
+  }
+
+  function refreshSavedSelect() {
+    if (!savedProfilesEl) return;
+    const map = loadSavedMap();
+    const current = savedProfilesEl.value;
+    savedProfilesEl.innerHTML = '<option value="">— load a saved preset —</option>';
+    Object.keys(map)
+      .sort((a, b) => a.localeCompare(b))
+      .forEach((name) => {
+        const opt = document.createElement("option");
+        opt.value = name;
+        opt.textContent = name;
+        savedProfilesEl.appendChild(opt);
+      });
+    if (current && map[current]) savedProfilesEl.value = current;
+  }
+
+  function applyProfile(id, applyDefaults = true) {
     const profile = profileDefaults[id];
     if (!profile) return;
     profileInput.value = id;
     if (profileHint) profileHint.textContent = profile.hint || "";
-    const d = profile.defaults || {};
-    setFieldValue("body_size", d.body_size);
-    setFieldValue("line_height", d.line_height);
-    setFieldValue("text_align", d.text_align);
-    setFieldValue("page_margin", d.page_margin);
-    setFieldValue("hyphenate", d.hyphenate);
-    setFieldValue("paragraph_indent", d.paragraph_indent);
-    setFieldValue("font_stack", d.font_stack);
-    setFieldValue("page_break_chapters", d.page_break_chapters);
-    setFieldValue("image_max_edge", d.image_max_edge);
+    if (profileTip) profileTip.textContent = profile.tip || profile.hint || "";
+    if (applyDefaults) {
+      const d = profile.defaults || {};
+      setFieldValue("body_size", d.body_size);
+      setFieldValue("line_height", d.line_height);
+      setFieldValue("text_align", d.text_align);
+      setFieldValue("page_margin", d.page_margin);
+      setFieldValue("hyphenate", d.hyphenate);
+      setFieldValue("paragraph_indent", d.paragraph_indent);
+      setFieldValue("font_stack", d.font_stack);
+      setFieldValue("page_break_chapters", d.page_break_chapters);
+      setFieldValue("image_max_edge", d.image_max_edge);
+    }
     if (profileGrid) {
       profileGrid.querySelectorAll(".profile-card").forEach((btn) => {
         const active = btn.dataset.profile === id;
@@ -73,6 +137,42 @@
       if (!btn) return;
       applyProfile(btn.dataset.profile);
     });
+  }
+
+  if (saveProfileBtn) {
+    saveProfileBtn.addEventListener("click", () => {
+      const name = window.prompt("Name for these settings (saved in this browser):");
+      if (!name || !name.trim()) return;
+      const map = loadSavedMap();
+      map[name.trim()] = readSettings();
+      persistSavedMap(map);
+      refreshSavedSelect();
+      savedProfilesEl.value = name.trim();
+    });
+  }
+
+  if (deleteProfileBtn) {
+    deleteProfileBtn.addEventListener("click", () => {
+      const name = savedProfilesEl && savedProfilesEl.value;
+      if (!name) {
+        alert("Select a saved preset to delete.");
+        return;
+      }
+      const map = loadSavedMap();
+      delete map[name];
+      persistSavedMap(map);
+      refreshSavedSelect();
+    });
+  }
+
+  if (savedProfilesEl) {
+    savedProfilesEl.addEventListener("change", () => {
+      const name = savedProfilesEl.value;
+      if (!name) return;
+      const map = loadSavedMap();
+      if (map[name]) applySettings(map[name]);
+    });
+    refreshSavedSelect();
   }
 
   function disableDownload() {

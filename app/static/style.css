@@ -237,9 +237,41 @@ select:focus {
 }
 
 .panel-note {
-  margin: 0 0 0.95rem;
+  margin: 0 0 0.45rem;
   font-size: 0.9rem;
   color: var(--ink-soft);
+}
+
+.profile-tip {
+  margin: 0 0 0.95rem;
+  font-size: 0.88rem;
+  line-height: 1.4;
+  color: var(--accent-deep);
+  max-width: 40rem;
+}
+
+.profile-save-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.75rem;
+  align-items: end;
+  margin-top: 1rem;
+}
+
+.profile-save-label {
+  margin: 0;
+}
+
+.profile-save-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+@media (max-width: 560px) {
+  .profile-save-row {
+    grid-template-columns: 1fr;
+  }
 }
 
 .profile-grid {

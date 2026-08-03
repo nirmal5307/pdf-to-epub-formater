@@ -90,7 +90,13 @@ def _ocr_lang_choices() -> list[dict]:
 @app.get("/", response_class=HTMLResponse)
 async def index(request: Request):
     profiles = [
-        {"id": key, "label": val["label"], "hint": val["hint"], "defaults": val["defaults"]}
+        {
+            "id": key,
+            "label": val["label"],
+            "hint": val["hint"],
+            "tip": val.get("tip", val["hint"]),
+            "defaults": val["defaults"],
+        }
         for key, val in READER_PROFILES.items()
     ]
     return templates.TemplateResponse(
@@ -112,7 +118,13 @@ async def capabilities():
         "ocr_langs": _ocr_lang_choices(),
         "book_langs": [{"code": c, "label": l} for c, l in BOOK_LANGS],
         "reader_profiles": [
-            {"id": key, "label": val["label"], "hint": val["hint"], "defaults": val["defaults"]}
+            {
+                "id": key,
+                "label": val["label"],
+                "hint": val["hint"],
+                "tip": val.get("tip", val["hint"]),
+                "defaults": val["defaults"],
+            }
             for key, val in READER_PROFILES.items()
         ],
     }

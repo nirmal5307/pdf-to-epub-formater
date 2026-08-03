@@ -53,7 +53,9 @@ If you read or convert books in another language, we’d love your help — see 
 
 ## Features
 
-- **Reader profiles** — Universal, Kobo, Kindle, BOOX / Android, Compact (small screens)
+- **Reader profiles** — Universal, Kobo, Kindle, BOOX, Tolino, Compact, Large type / comfort (with on-screen tips)  
+- **Saved settings** — save/load your typography mix in the browser  
+- **Smarter chaptering languages** — English-first, plus FR/DE/ES/IT/PT/NL chapter & Part words
 - **Typography controls** — serif/sans, type size, line height, justify/left, indent, hyphenation, margins, chapter breaks
 - **Smart chaptering** — uses TOC when available; prefers Part / “How to…” structure; avoids exploding into page chunks
 - **Cover extraction** — PDF page 1 (or a custom cover image) becomes the EPUB cover

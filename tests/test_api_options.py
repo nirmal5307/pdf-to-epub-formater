@@ -45,7 +45,10 @@ def test_capabilities_lists_profiles(client):
     assert res.status_code == 200
     body = res.json()
     ids = {p["id"] for p in body["reader_profiles"]}
-    assert {"universal", "kobo", "kindle", "boox", "compact"} <= ids
+    assert {"universal", "kobo", "kindle", "boox", "compact", "tolino", "comfort"} <= ids
+    tips = {p["id"]: p.get("tip") for p in body["reader_profiles"]}
+    assert tips["tolino"]
+    assert tips["comfort"]
 
 
 def test_home_renders_profiles(client):

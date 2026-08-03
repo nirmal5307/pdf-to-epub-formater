@@ -37,15 +37,28 @@
         <div class="panel">
           <h2 class="panel-title">Reader profile</h2>
           <p class="panel-note" id="profile-hint">Safe defaults for Xteink, Kobo, Kindle, Boox, PocketBook</p>
+          <p class="profile-tip" id="profile-tip">Best starting point. Justifies text, medium type, and balanced image size for most sideload apps.</p>
           <div class="profile-grid" id="profile-grid" role="radiogroup" aria-label="Reader profile">
             {% for p in reader_profiles %}
-            <button type="button" class="profile-card {% if p.id == 'universal' %}is-active{% endif %}" data-profile="{{ p.id }}" aria-pressed="{{ 'true' if p.id == 'universal' else 'false' }}">
+            <button type="button" class="profile-card {% if p.id == 'universal' %}is-active{% endif %}" data-profile="{{ p.id }}" data-tip="{{ p.tip }}" aria-pressed="{{ 'true' if p.id == 'universal' else 'false' }}">
               <strong>{{ p.label }}</strong>
               <span>{{ p.hint }}</span>
             </button>
             {% endfor %}
           </div>
           <input type="hidden" name="reader_profile" id="reader_profile" value="universal" />
+          <div class="profile-save-row">
+            <label class="profile-save-label">
+              <span>Saved settings</span>
+              <select id="saved-profiles" aria-label="Saved conversion settings">
+                <option value="">— load a saved preset —</option>
+              </select>
+            </label>
+            <div class="profile-save-actions">
+              <button type="button" class="btn ghost" id="save-profile-btn">Save current</button>
+              <button type="button" class="btn ghost" id="delete-profile-btn">Delete</button>
+            </div>
+          </div>
         </div>
 
         <div class="panel">
@@ -165,9 +178,9 @@
             <span class="option-text">
               <strong>OCR scanned pages</strong>
               {% if ocr_available %}
-              <em>Local Tesseract · slower, for image-only PDFs</em>
+              <em>Turn on for image-only / scanned paperbacks · local Tesseract · slower</em>
               {% else %}
-              <em>Install Tesseract (<code>brew install tesseract</code>) to enable</em>
+              <em>Install Tesseract (<code>brew install tesseract</code>) for scanned PDFs</em>
               {% endif %}
             </span>
           </label>

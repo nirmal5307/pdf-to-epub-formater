@@ -30,6 +30,11 @@ def test_part_heading_detection():
     assert _is_part_heading("Part One")
     assert _is_part_heading("PART II — Advanced")
     assert _is_part_heading("Chapter 3: Beginnings")
+    assert _is_part_heading("Chapitre 3 : Débuts")
+    assert _is_part_heading("Kapitel 2 — Anfang")
+    assert _is_part_heading("Capítulo 4: Empieza")
+    assert _is_part_heading("Parte due")
+    assert _is_part_heading("Hoofdstuk 1")
     assert not _is_part_heading("How to smile better")
 
 
@@ -37,6 +42,8 @@ def test_trick_heading_detection():
     book = "How to Talk to Anyone"
     assert _is_trick_heading("How to Make Your Smile Magically Different", book)
     assert _is_trick_heading("12. How to Win Over Crowds Instantly", book)
+    assert _is_trick_heading("Comment réussir une conversation facile", book)
+    assert _is_trick_heading("Cómo hablar con cualquier persona hoy", book)
     # Running header that repeats the book title should be rejected
     assert not _is_trick_heading("How to Talk to Anyone", book)
     assert not _is_trick_heading("How to", book)
