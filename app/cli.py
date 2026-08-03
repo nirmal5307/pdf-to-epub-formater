@@ -139,7 +139,7 @@ def main(argv: list[str] | None = None) -> int:
     )
     parser.add_argument(
         "--page-margin",
-        choices=["tight", "normal", "roomy"],
+        choices=["tight", "compact", "normal", "roomy"],
         default=None,
         help="Page padding preset",
     )

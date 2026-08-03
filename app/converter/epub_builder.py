@@ -59,10 +59,15 @@ def build_eink_css(options: ConvertOptions | None = None) -> str:
     align = "justify" if opts.text_align == "justify" else "left"
     indent = "1.2em" if opts.paragraph_indent else "0"
     hyphens = "auto" if opts.hyphenate else "manual"
+    # Compact / tight recipes reclaim vertical space without squeezing line length too hard
+    dense = opts.reader_profile == "compact" or opts.page_margin in {"compact", "tight"}
+    heading_margin = "1.05em 0 0.45em" if dense else "1.4em 0 0.6em"
+    para_gap = "0.55em" if dense else "0.75em"
+    space_chapter = "1.6em" if dense else "2.2em"
     chapter_break = (
         "page-break-before: always; break-before: page;"
         if opts.page_break_chapters and opts.chapter_break_style == "page"
-        else "margin-top: 2.2em;"
+        else f"margin-top: {space_chapter};"
     )
 
     return f"""
@@ -95,7 +100,7 @@ h1, h2, h3, h4 {{
   page-break-after: avoid;
   break-after: avoid;
   line-height: 1.25;
-  margin: 1.4em 0 0.6em;
+  margin: {heading_margin};
 }}
 
 h1 {{ font-size: 1.55em; margin-top: 0; }}
@@ -103,7 +108,7 @@ h2 {{ font-size: 1.3em; }}
 h3 {{ font-size: 1.12em; }}
 
 p {{
-  margin: 0 0 0.75em;
+  margin: 0 0 {para_gap};
   text-indent: {indent};
 }}
 

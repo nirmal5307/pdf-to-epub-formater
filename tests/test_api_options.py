@@ -42,6 +42,27 @@ def test_css_roomy_margins_and_indent():
     assert "Helvetica Neue" in css
 
 
+def test_compact_profile_margin_recipe():
+    from app.converter.options import READER_PROFILES
+
+    defaults = READER_PROFILES["compact"]["defaults"]
+    assert defaults["page_margin"] == "compact"
+    assert float(defaults["line_height"]) >= 1.4
+
+    css = build_eink_css(
+        ConvertOptions(
+            reader_profile="compact",
+            page_margin="compact",
+            body_size="small",
+            line_height=1.4,
+            paragraph_indent=False,
+        )
+    )
+    assert "0.45em 0.55em 0.7em" in css
+    assert "margin: 0 0 0.55em" in css
+    assert "1.05em 0 0.45em" in css
+
+
 def test_embed_fonts_css_and_epub_package(tmp_path: Path):
     css = build_eink_css(ConvertOptions(embed_fonts=True, font_stack="serif"))
     assert "@font-face" in css

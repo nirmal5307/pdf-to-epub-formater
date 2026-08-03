@@ -88,13 +88,13 @@ READER_PROFILES = {
     },
     "compact": {
         "label": "Compact / small screens",
-        "hint": "Tighter margins for smaller panels",
-        "tip": "Tighter margins and smaller type for Xteink-class / small panels — more words per page.",
+        "hint": "Balanced tight margins for Xteink-class panels",
+        "tip": "Compact recipe: denser page padding, slightly open line height, and tighter paragraph/heading gaps so small screens fit more words without feeling cramped.",
         "defaults": {
             "body_size": "small",
-            "line_height": "1.35",
+            "line_height": "1.4",
             "text_align": "justify",
-            "page_margin": "tight",
+            "page_margin": "compact",
             "hyphenate": True,
             "paragraph_indent": False,
             "font_stack": "serif",
@@ -127,7 +127,9 @@ BODY_SIZES = {
 }
 
 MARGIN_PRESETS = {
-    "tight": "0.4em 0.5em 0.9em",
+    # top | horizontal | bottom — tuned for reflow on e-ink
+    "tight": "0.35em 0.4em 0.65em",
+    "compact": "0.45em 0.55em 0.7em",
     "normal": "0.6em 0.8em 1.2em",
     "roomy": "0.9em 1.1em 1.5em",
 }
